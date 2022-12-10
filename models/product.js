@@ -12,14 +12,18 @@ const getProductsFromFile = (cb) => {
   fs.readFile(p, (err, fileContent) => {
     if (err) {
       return cb([]);
+    } else {
+      cb(JSON.parse(fileContent));
     }
-    cb(JSON.parse(fileContent));
   });
 };
 // Export as next gen js using class, we can also use es6
 module.exports = class Product {
-  constructor(t) {
-    this.title = t;
+  constructor(title, imageURL, description, price) {
+    this.title = title;
+    this.imageURL = imageURL;
+    this.description = description;
+    this.price = price;
   }
 
   // function without function keyword
