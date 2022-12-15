@@ -6,8 +6,8 @@ exports.getProducts = (req, res, next) => {
   Product.fetchAll((products) => {
     res.render("shop/product-list", {
       prods: products,
-      pageTitle: "Shop",
-      path: "/",
+      pageTitle: "All Products",
+      path: "/products",
     });
   });
 };
@@ -21,15 +21,14 @@ exports.getProduct = (req, res, next) => {
       path: "/products",
     });
   });
-  // res.redirect("/");
 };
 
 exports.getIndex = (req, res, next) => {
   Product.fetchAll((products) => {
     res.render("shop/index", {
       prods: products,
-      pageTitle: "All products",
-      path: "/products",
+      pageTitle: "Shop",
+      path: "/",
     });
   });
 };

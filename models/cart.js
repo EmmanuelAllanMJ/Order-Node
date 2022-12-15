@@ -13,6 +13,7 @@ module.exports = class Cart {
         cart = JSON.parse(fileContent);
       }
       //   Analyze the cart => find existing product
+      console.log(cart);
       const existingProductIndex = cart.products.findIndex(
         (prod) => prod.id === id
       );
