@@ -2,19 +2,28 @@ const { getDb } = require("../util/database");
 const mongodb = require("mongodb");
 
 module.exports = class Product {
-  constructor(title, price, description, imageUrl) {
+  constructor(title, price, description, imageUrl, id) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
+    this._id = new mongodb.ObjectId(id);
   }
 
   save() {
     // Connecting with db
     const db = getDb();
-    return db
-      .collection("products")
-      .insertOne(this)
+    let dbOp;
+    if (this._id) {
+      // Update product
+      // updateOne does not replaces the, instead we have to describe the operation
+      dbOp = db
+        .collection("products")
+        .updateOne({ _id: this._id }, { $set: this });
+    } else {
+      let dbOp = db.collection("products").insertOne(this);
+    }
+    return dbOp
       .then((result) => {
         console.log(result);
       })
