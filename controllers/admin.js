@@ -13,9 +13,16 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(null, title, imageUrl, description, price);
-  product.save();
-  res.redirect("/");
+  console.log(this);
+  const product = new Product(title, price, description, imageUrl);
+  product
+    .save()
+    .then((result) => {
+      console.log("Created Product");
+      console.log(result);
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
 };
 exports.getEditProduct = (req, res, next) => {
   // Query params are query after ? in the address, used to add optional info
@@ -56,15 +63,15 @@ exports.postEditProduct = (req, res, next) => {
   res.redirect("/admin/products");
 };
 
-exports.getProducts = (req, res, next) => {
-  Product.fetchAll((products) => {
-    res.render("admin/products", {
-      prods: products,
-      pageTitle: "Admin products",
-      path: "/admin/products",
-    });
-  });
-};
+// exports.getProducts = (req, res, next) => {
+//   Product.fetchAll((products) => {
+//     res.render("admin/products", {
+//       prods: products,
+//       pageTitle: "Admin products",
+//       path: "/admin/products",
+//     });
+//   });
+// };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
