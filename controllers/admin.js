@@ -13,7 +13,7 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  console.log(this);
+  // console.log(this);
   // When retreiving data the objectId is converted to string
   const product = new Product(
     title,
