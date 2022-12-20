@@ -14,7 +14,15 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   console.log(this);
-  const product = new Product(title, price, description, imageUrl);
+  // When retreiving data the objectId is converted to string
+  const product = new Product(
+    title,
+    price,
+    description,
+    imageUrl,
+    null,
+    req.user._id
+  );
   product
     .save()
     .then((result) => {
