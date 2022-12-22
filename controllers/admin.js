@@ -13,21 +13,12 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  // console.log(this);
-  // When retreiving data the objectId is converted to string
-  const product = new Product(
-    title,
-    price,
-    description,
-    imageUrl,
-    null,
-    req.user._id
-  );
+  const product = new Product({ title, imageUrl, price, description });
+  // the save method is coming from mongoose
   product
     .save()
     .then((result) => {
       console.log("Created Product");
-      console.log(result);
       res.redirect("/admin/products");
     })
     .catch((err) => console.log(err));
