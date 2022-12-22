@@ -13,7 +13,15 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product({ title, imageUrl, price, description });
+  // instead of giving req.user._id we can give req.user which would save the entire user object and mongoose will just pick the id
+  const product = new Product({
+    title,
+    imageUrl,
+    price,
+    description,
+    userId: req.user,
+  });
+
   // the save method is coming from mongoose
   product
     .save()
@@ -69,13 +77,20 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find().then((products) => {
-    res.render("admin/products", {
-      prods: products,
-      pageTitle: "Admin products",
-      path: "/admin/products",
+  // populate allows you to tell mongoose to populate a certain field with all the detailed info and not just the id
+  // select helps to define which field you want to select and unselect
+  // title price include, minus -_id means exclude
+  Product.find()
+    // .select("title price -_id")
+    // .populate("userId", "name")
+    .then((products) => {
+      console.log(products);
+      res.render("admin/products", {
+        prods: products,
+        pageTitle: "Admin products",
+        path: "/admin/products",
+      });
     });
-  });
 };
 
 exports.postDeleteProduct = (req, res, next) => {

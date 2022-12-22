@@ -21,6 +21,12 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  // ref -which other mongoose model has related to the data in that field
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 // model is a function we are calling which is important for mongoose behind the scenes to connect a schema with a name, here the name is Product
