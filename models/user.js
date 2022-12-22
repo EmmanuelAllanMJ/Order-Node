@@ -1,3 +1,29 @@
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+// here cart is a embedded document
+const userSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  cart: {
+    items: [
+      {
+        productId: { type: Schema.Types.ObjectId, required: true },
+        quantity: { type: Number, required: true },
+      },
+    ],
+  },
+});
+
+module.exports = mongoose.model("User", userSchema);
+
 // const { getDb } = require("../util/database");
 // const mongodb = require("mongodb");
 
