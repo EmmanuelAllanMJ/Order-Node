@@ -41,15 +41,23 @@ exports.getIndex = (req, res, next) => {
       console.log(err);
     });
 };
-// exports.getCart = (req, res, next) => {
-//   req.user.getCart().then((products) => {
-//     res.render("shop/cart", {
-//       pageTitle: "Your Cart",
-//       path: "/cart",
-//       products: products,
-//     });
-//   });
-// };
+exports.getCart = (req, res, next) => {
+  // Give the condition to populate
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      // console.log(user.cart.items);
+      const products = user.cart.items;
+      res.render("shop/cart", {
+        pageTitle: "Your Cart",
+        path: "/cart",
+        products: products,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
