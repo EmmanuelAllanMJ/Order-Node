@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const Order = require("../models/order");
 
 exports.getProducts = (req, res, next) => {
   // find will give us the products not the cursor. To get cursor we use .find().cursor().next() next to get the last element
@@ -83,25 +84,43 @@ exports.postCartDelete = (req, res, next) => {
     });
 };
 
-// exports.getOrders = (req, res, next) => {
-//   req.user.getOrders().then((orders) => {
-//     res.render("shop/orders", {
-//       pageTitle: "Your Orders",
-//       path: "/orders",
-//       orders: orders,
-//     });
-//   });
-// };
-// exports.postOrders = (req, res, next) => {
-//   req.user
-//     .addOrder()
-//     .then((result) => {
-//       res.redirect("/orders");
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// };
+exports.getOrders = (req, res, next) => {
+  Order.find({ "user.userId": req.user._id }).then((orders) => {
+    res.render("shop/orders", {
+      pageTitle: "Your Orders",
+      path: "/orders",
+      orders: orders,
+    });
+  });
+};
+exports.postOrders = (req, res, next) => {
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      const products = user.cart.items.map((i) => {
+        // we get all the data using ._doc metadata
+        console.log(i.productId._doc);
+        return { quantity: i.quantity, product: { ...i.productId._doc } };
+      });
+      const order = new Order({
+        user: {
+          name: req.user.name,
+          userId: req.user,
+        },
+        products: products,
+      });
+      order.save();
+    })
+    .then((result) => {
+      return req.user.clearCart();
+    })
+    .then(() => {
+      res.redirect("/orders");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 // exports.getCheckout = (req, res, next) => {
 //   res.render("shop/checkout", {
