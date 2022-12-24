@@ -44,9 +44,6 @@ app.use((req, res, next) => {
 });
 
 // To use them like calling a function
-app.use("/admin", adminRoutes);
-app.use(shopRoutes);
-app.use(authRoutes);
 // config session setup
 // secret - used for signing the hash which secretly stores our id there
 // resave(false) - session will not be saved on every request that is done
@@ -56,6 +53,9 @@ app.use(authRoutes);
 app.use(
   session({ secret: "my string", resave: false, saveUninitialized: false })
 );
+app.use("/admin", adminRoutes);
+app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use("/", errorController.get404);
 

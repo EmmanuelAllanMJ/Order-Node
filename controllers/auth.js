@@ -9,8 +9,7 @@ exports.getLogin = (req, res, next) => {
   });
 };
 exports.postLogin = (req, res, next) => {
-  //   setting cookie and time
-  res.setHeader("Set-Cookie", "loggedIn=true; Max-Age=10");
-
+  // session still needs cookie to identify the user but the sensitive info is stored on the server and now the session is store in memory
+  req.session.isLoggedIn = true;
   res.redirect("/");
 };
