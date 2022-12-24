@@ -1,7 +1,12 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const path = require("path");
+const session = require("express-session");
+
+// controller
 const errorController = require("./controllers/error");
+
+// env
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -42,6 +47,15 @@ app.use((req, res, next) => {
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
+// config session setup
+// secret - used for signing the hash which secretly stores our id there
+// resave(false) - session will not be saved on every request that is done
+// saveUninitialized(false) -ensure no session will be saved for a request where it doesnt need to be saved
+// we can also config cookie
+// in production it should be long string value
+app.use(
+  session({ secret: "my string", resave: false, saveUninitialized: false })
+);
 
 app.use("/", errorController.get404);
 
