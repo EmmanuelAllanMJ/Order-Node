@@ -11,6 +11,7 @@ const User = require("./models/user");
 // Importing routes
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 const mongoose = require("mongoose");
 
 const app = express();
@@ -37,6 +38,7 @@ app.use((req, res, next) => {
 // To use them like calling a function
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use("/", errorController.get404);
 
