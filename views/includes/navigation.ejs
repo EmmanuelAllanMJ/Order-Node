@@ -56,7 +56,8 @@
         >Orders</a
       >
     </li>
-    <!-- <li class="mobile-nav__item">
+    <% if(isAuthenticated){ %>
+    <li class="mobile-nav__item">
       <a
         class="<%= path === '/admin/add-product' ? 'active' : '' %>"
         href="/admin/add-product"
@@ -69,7 +70,8 @@
         href="/admin/products"
         >Admin Products
       </a>
-    </li> -->
+    </li>
+    <% } %>
   </ul>
   <ul>
     <li class="mobile-nav__item">

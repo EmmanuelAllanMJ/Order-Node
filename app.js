@@ -29,6 +29,9 @@ app.use((req, res, next) => {
   User.findById("63a42c5810c419781a2f1d7a")
     .then((user) => {
       // Creating a object for user
+      // We are using the request here, as req will be lost after request and response
+      // so whenever there is a request, we will be executing this file so, req.user will be restored on every request
+      // so this middleware runs on every incoming request before our routes handle it
       req.user = user;
       next();
     })
