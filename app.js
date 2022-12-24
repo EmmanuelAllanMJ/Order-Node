@@ -2,6 +2,9 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+// this will give a fn to execute where we will give session is passed to a fn which is yielded by requiring connect mongodb session and
+// the result of that fn call is stored in mongodb store
+const MongoDBStore = require("connect-mongodb-session")(session);
 
 // controller
 const errorController = require("./controllers/error");
@@ -18,8 +21,16 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 const mongoose = require("mongoose");
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.lfr5p.mongodb.net/${process.env.MONGODB_DEFAULT_DB}`;
 
 const app = express();
+// mongodbstore will yield a constructor where you can pass object
+// uri - which db you need to store the data
+// collection - compulsory, we can also set time to delete
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: "sessions",
+});
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -51,7 +62,12 @@ app.use((req, res, next) => {
 // we can also config cookie
 // in production it should be long string value
 app.use(
-  session({ secret: "my string", resave: false, saveUninitialized: false })
+  session({
+    secret: "my string",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+  })
 );
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
@@ -60,9 +76,7 @@ app.use(authRoutes);
 app.use("/", errorController.get404);
 
 mongoose
-  .connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.lfr5p.mongodb.net/${process.env.MONGODB_DEFAULT_DB}?retryWrites=true&w=majority`
-  )
+  .connect(MONGODB_URI)
   .then((result) => {
     User.findOne().then((user) => {
       if (!user) {
