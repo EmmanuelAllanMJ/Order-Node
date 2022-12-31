@@ -39,21 +39,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Telling the folder which you want to give read access
 app.use(express.static(path.join(__dirname, "public")));
 
-// This middleware is to find the user and then we store it in user in our request
-// This is just to extract userId and use it in all our app
-app.use((req, res, next) => {
-  User.findById("63a42c5810c419781a2f1d7a")
-    .then((user) => {
-      // Creating a object for user
-      // We are using the request here, as req will be lost after request and response
-      // so whenever there is a request, we will be executing this file so, req.user will be restored on every request
-      // so this middleware runs on every incoming request before our routes handle it
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
-});
-
 // To use them like calling a function
 // config session setup
 // secret - used for signing the hash which secretly stores our id there

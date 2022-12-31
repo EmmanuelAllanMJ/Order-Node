@@ -1,3 +1,5 @@
+const User = require("../models/user");
+
 exports.getLogin = (req, res, next) => {
   //   const isLoggedIn =
   //     req.get("Cookie").split("=")[1].trim().split("%3D")[1] === "true";
@@ -9,7 +11,12 @@ exports.getLogin = (req, res, next) => {
   });
 };
 exports.postLogin = (req, res, next) => {
-  // session still needs cookie to identify the user but the sensitive info is stored on the server and now the session is store in memory
-  req.session.isLoggedIn = true;
-  res.redirect("/");
+  // fake login process
+  User.findById("63a42c5810c419781a2f1d7a")
+    .then((user) => {
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      res.redirect("/");
+    })
+    .catch((err) => console.log(err));
 };

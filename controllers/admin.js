@@ -5,7 +5,7 @@ exports.getAddProduct = (req, res, next) => {
     pageTitle: "Add product",
     path: "/admin/add-product",
     editing: false,
-    isAuthenticated: req.isLoggedIn,
+    isAuthenticated: req.session.user,
   });
 };
 
@@ -20,7 +20,7 @@ exports.postAddProduct = (req, res, next) => {
     imageUrl,
     price,
     description,
-    userId: req.user,
+    userId: req.session.user,
   });
 
   // the save method is coming from mongoose
@@ -48,7 +48,7 @@ exports.getEditProduct = (req, res, next) => {
       path: "/admin/edit-product",
       editing: editMode,
       product,
-      isAuthenticated: req.isLoggedIn,
+      isAuthenticated: req.session.user,
     });
   });
 };
@@ -91,7 +91,7 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: "Admin products",
         path: "/admin/products",
-        isAuthenticated: req.isLoggedIn,
+        isAuthenticated: req.session.user,
       });
     });
 };
