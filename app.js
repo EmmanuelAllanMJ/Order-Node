@@ -39,13 +39,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Telling the folder which you want to give read access
 app.use(express.static(path.join(__dirname, "public")));
 
-// To use them like calling a function
-// config session setup
-// secret - used for signing the hash which secretly stores our id there
-// resave(false) - session will not be saved on every request that is done
-// saveUninitialized(false) -ensure no session will be saved for a request where it doesnt need to be saved
-// we can also config cookie
-// in production it should be long string value
 app.use(
   session({
     secret: "my string",
@@ -54,6 +47,25 @@ app.use(
     store: store,
   })
 );
+app.use((req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
+
+  User.findById(req.session.user._id)
+    .then((user) => {
+      // sessions here will be managed for us automatically and for every incoming request we register the middleware,
+      // middleware will look for a session cookie, if it finds one it will look for fitting session in the db and load data from there
+      // Now we will have the session data to load our real user to create our mongoose user model
+      // We will be creating a user based on data stored in the session, so data that persists across the request, which will only live for
+      // that request but it's fueled by data from the session and therefore it survives across the request
+      // we are access the user data and save it in req
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
+});
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
