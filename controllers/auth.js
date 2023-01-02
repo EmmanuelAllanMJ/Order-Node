@@ -17,6 +17,7 @@ exports.getSignup = (req, res, next) => {
   res.render("auth/signup", {
     pageTitle: "SignUp",
     path: "/signup",
+    errorMessage: req.flash("error")[0],
   });
 };
 
@@ -65,6 +66,8 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email })
     .then((userDoc) => {
       if (userDoc) {
+        req.flash("error", "Email already exist, please pick a different one.");
+
         return res.redirect("/signup");
       }
       // 12 is the number of hashing required and 12 is secured
