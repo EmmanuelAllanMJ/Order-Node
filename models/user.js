@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 
 // here cart is a embedded document
 const userSchema = new Schema({
-  name: {
+  email: {
     type: String,
     required: true,
   },
-  email: {
+  password: {
     type: String,
     required: true,
   },
