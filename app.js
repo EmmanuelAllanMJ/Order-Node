@@ -2,9 +2,8 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
-// this will give a fn to execute where we will give session is passed to a fn which is yielded by requiring connect mongodb session and
-// the result of that fn call is stored in mongodb store
 const MongoDBStore = require("connect-mongodb-session")(session);
+const csrf = require("csurf");
 
 // controller
 const errorController = require("./controllers/error");
@@ -32,6 +31,9 @@ const store = new MongoDBStore({
   collection: "sessions",
 });
 
+// default settings, initializing csrf
+const csrfProtection = csrf();
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -47,6 +49,9 @@ app.use(
     store: store,
   })
 );
+// using csrf middleware
+app.use(csrfProtection);
+
 app.use((req, res, next) => {
   if (!req.session.user) {
     return next();
@@ -64,6 +69,15 @@ app.use((req, res, next) => {
       next();
     })
     .catch((err) => console.log(err));
+});
+
+// after user middleware and before routes
+app.use((req, res, next) => {
+  // special field on the response, the local field, this allows us to set local variables that are passed into the views local
+  // because there exist only in the views, for every request these two field will be set
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 app.use("/admin", adminRoutes);

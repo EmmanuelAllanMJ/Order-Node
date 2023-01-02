@@ -38,7 +38,8 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: "Shop",
         path: "/",
-        isAuthenticated: req.user,
+        // isAuthenticated: req.user,
+        // csrfToken: req.csrfToken(),
       });
     })
     .catch((err) => {
@@ -109,7 +110,7 @@ exports.postOrders = (req, res, next) => {
       });
       const order = new Order({
         user: {
-          name: req.user.name,
+          email: req.user.email,
           userId: req.user,
         },
         products: products,
