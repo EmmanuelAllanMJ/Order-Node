@@ -10,6 +10,15 @@ exports.getLogin = (req, res, next) => {
     isAuthenticated: false,
   });
 };
+
+exports.getSignup = (req, res, next) => {
+  res.render("auth/signup", {
+    pageTitle: "SignUp",
+    path: "/signup",
+    isAuthenticated: false,
+  });
+};
+
 exports.postLogin = (req, res, next) => {
   // fake login process
   // If we are doing like this, the session wont be knowing about the models schema so we cant able to interact with the database
@@ -29,6 +38,9 @@ exports.postLogin = (req, res, next) => {
     })
     .catch((err) => console.log(err));
 };
+
+exports.postSignup = (req, res, next) => {};
+
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
     console.log(err);
