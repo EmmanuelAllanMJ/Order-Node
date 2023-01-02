@@ -1,6 +1,19 @@
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
 
 const User = require("../models/user");
+// env
+const dotenv = require("dotenv");
+dotenv.config();
+
+// for nodemailer, configuring transporter
+var transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: `pixiemj00@gmail.com`,
+    pass: `${process.env.MAIL_PWD}`,
+  },
+});
 
 exports.getLogin = (req, res, next) => {
   //   const isLoggedIn =
@@ -85,6 +98,74 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
           res.redirect("/login");
+          // configuring email to be sent
+          const htmlContent = `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta http-equiv="X-UA-Compatible" content="IE=edge">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Document</title>
+              <style>
+                body{
+                text-align:center;
+            }
+            img{
+              width:50%;
+              height:50%;
+
+            }
+            h1{
+              color:#00695c;
+                
+            }
+            a {
+              background-color: #00695c;
+              color: white;
+              padding: 1em 1.5em;
+              text-decoration: none;
+              text-transform: uppercase;
+              border-radius:50px;
+            }
+
+            a:hover {
+              background-color: #555;
+            }
+
+            a:active {
+              background-color: black;
+            }
+
+            a:visited {
+              background-color: #ccc;
+            }
+              </style>
+            </head>
+            <body>
+              <img src='https://d1oco4z2z1fhwp.cloudfront.net/templates/default/326/illo_welcome_1.png' alt='welcome'/>
+              <h1>Welcome user</h1>
+              <p>Thanks for signing up for our updates. We’ll be sending an occasional email with everything new and good that you’ll probably want to know about: new products, posts, promos, and parties.</p>
+              <a href="http://localhost:3000/">Start Shopping</a>
+            </body>
+            </html>`;
+          const msg = {
+            to: email,
+            from: `pixiemj00@gmail.com`,
+            subject: "Signup successfully",
+            text: "Signup successfully",
+            html: htmlContent,
+          };
+          //send the email
+          transporter.sendMail(msg, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Email sent: " + info.response);
+            }
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
     })
 
