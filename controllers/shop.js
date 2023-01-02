@@ -10,7 +10,6 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: "All Products",
         path: "/products",
-        isAuthenticated: req.user,
       });
     })
     .catch((err) => {
@@ -26,7 +25,6 @@ exports.getProduct = (req, res, next) => {
       product: product,
       pageTitle: product.title,
       path: "/products",
-      isAuthenticated: req.user,
     });
   });
 };
@@ -38,7 +36,7 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: "Shop",
         path: "/",
-        // isAuthenticated: req.user,
+        //
         // csrfToken: req.csrfToken(),
       });
     })
@@ -57,7 +55,6 @@ exports.getCart = (req, res, next) => {
         pageTitle: "Your Cart",
         path: "/cart",
         products: products,
-        isAuthenticated: req.user,
       });
     })
     .catch((err) => {
@@ -95,7 +92,6 @@ exports.getOrders = (req, res, next) => {
       pageTitle: "Your Orders",
       path: "/orders",
       orders: orders,
-      isAuthenticated: req.user,
     });
   });
 };
