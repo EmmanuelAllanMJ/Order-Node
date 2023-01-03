@@ -5,7 +5,7 @@ exports.getProducts = (req, res, next) => {
   // find will give us the products not the cursor. To get cursor we use .find().cursor().next() next to get the last element
   Product.find()
     .then((products) => {
-      console.log(products);
+      // console.log(products);
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
@@ -69,7 +69,7 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product);
     })
     .then((result) => {
-      console.log("Result:", result);
+      // console.log("Result:", result);
       res.redirect("/cart");
     });
 };
@@ -101,7 +101,7 @@ exports.postOrders = (req, res, next) => {
     .then((user) => {
       const products = user.cart.items.map((i) => {
         // we get all the data using ._doc metadata
-        console.log(i.productId._doc);
+        // console.log(i.productId._doc);
         return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
       const order = new Order({

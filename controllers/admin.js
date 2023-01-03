@@ -64,16 +64,20 @@ exports.postEditProduct = (req, res, next) => {
   } = req.body;
   Product.findById(prodId)
     .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        // as this will return a promise, we will include nested then
+        return res.redirect("/");
+      }
       product.title = updatedTitle.trim();
       product.price = updatedPrice.trim();
       product.description = updatedDesc.trim();
       product.imageUrl = updatedImageUrl.trim();
-      return product.save();
+      return product.save().then((result) => {
+        console.log("Updated Product");
+        res.redirect("/admin/products");
+      });
     })
-    .then((result) => {
-      console.log("Updated Product");
-      res.redirect("/admin/products");
-    })
+
     .catch((err) => {
       console.log(err);
     });
@@ -83,11 +87,11 @@ exports.getProducts = (req, res, next) => {
   // populate allows you to tell mongoose to populate a certain field with all the detailed info and not just the id
   // select helps to define which field you want to select and unselect
   // title price include, minus -_id means exclude
-  Product.find()
+  Product.find({ userId: req.user._id })
     // .select("title price -_id")
     // .populate("userId", "name")
     .then((products) => {
-      console.log(products);
+      // console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin products",
@@ -98,7 +102,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndRemove(prodId)
+  Product.findByIdAndRemove({ _id: prodId, userId: req.user._id })
     .then(() => {
       console.log("Deleted succesfully");
       res.redirect("/admin/products");
