@@ -12,7 +12,16 @@ router.get("/signup", authController.getSignup);
 
 // validator is required for post route
 // check() will return a middleware
-router.post("/login", authController.postLogin);
+router.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Please enter a valid email"),
+    check("password", "Enter valid password")
+      .isLength({ min: 5 })
+      .isAlphanumeric(),
+  ],
+  authController.postLogin
+);
 // to check for a specific email, we use custom
 router.post(
   "/signup",
