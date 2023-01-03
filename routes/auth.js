@@ -15,10 +15,14 @@ router.get("/signup", authController.getSignup);
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Please enter a valid email"),
-    check("password", "Enter valid password")
+    body("email")
+      .isEmail()
+      .withMessage("Please enter a valid email")
+      .normalizeEmail(),
+    body("password", "Enter valid password")
       .isLength({ min: 5 })
-      .isAlphanumeric(),
+      .isAlphanumeric()
+      .trim(),
   ],
   authController.postLogin
 );
@@ -39,19 +43,24 @@ router.post(
             "Email already exist, please pick a different one."
           );
         });
-      }),
+      })
+      .normalizeEmail(),
     //  we are checking the password in the body of the request not considering the header
     //   if we have same error message for different checks, we give the error msg inside the brackets
     body(
       "password",
       "Please enter a password with only numbers and text and atleast 5 characters"
-    ).isLength({ min: 5 }),
-    body("confirmPassword").custom((value, { req }) => {
-      if (value != req.body.password) {
-        throw new Error("Password have to match!");
-      }
-      return true;
-    }),
+    )
+      .isLength({ min: 5 })
+      .trim(),
+    body("confirmPassword")
+      .custom((value, { req }) => {
+        if (value != req.body.password) {
+          throw new Error("Password have to match!");
+        }
+        return true;
+      })
+      .trim(),
   ],
   authController.postSignup
 );

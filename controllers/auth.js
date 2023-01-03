@@ -27,6 +27,8 @@ exports.getLogin = (req, res, next) => {
     pageTitle: "Login",
     path: "/login",
     errorMessage: req.flash("error")[0],
+    validationErrors: [],
+    oldInput: { email: "", password: "" },
   });
 };
 
@@ -35,6 +37,8 @@ exports.getSignup = (req, res, next) => {
     pageTitle: "SignUp",
     path: "/signup",
     errorMessage: req.flash("error")[0],
+    oldInput: { email: "", password: "", confirmPassword: "" },
+    validationErrors: [],
   });
 };
 
@@ -44,10 +48,12 @@ exports.postLogin = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.render("auth/login", {
+    return res.status(422).render("auth/login", {
       pageTitle: "Login",
       path: "/login",
       errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      oldInput: { email, password },
     });
   }
 
@@ -55,9 +61,15 @@ exports.postLogin = (req, res, next) => {
     .then((user) => {
       if (!user) {
         // first - key, second - value
-        req.flash("error", "Invalid email or password.");
+        // req.flash("error", "Invalid email or password.");
 
-        return res.redirect("/login");
+        return res.status(422).render("auth/login", {
+          pageTitle: "Login",
+          path: "/login",
+          errorMessage: "Invalid email or password",
+          validationErrors: [],
+          oldInput: { email, password },
+        });
       }
       bcrypt
         .compare(password, user.password)
@@ -73,9 +85,14 @@ exports.postLogin = (req, res, next) => {
               res.redirect("/");
             });
           }
-          req.flash("error", "Invalid email or password.");
-
-          res.redirect("/login");
+          // req.flash("error", "Invalid email or password.");
+          return res.status(422).render("auth/login", {
+            pageTitle: "Login",
+            path: "/login",
+            errorMessage: "Invalid email or password.",
+            validationErrors: [],
+            oldInput: { email, password },
+          });
         })
         .catch((err) => {
           console.log(err);
@@ -88,6 +105,7 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
   // to retrieve validation result fn will go through that errors object managed by that middleware on the request and will then collect them all
   // in this error constant and we can use that constant, using that constant we can check for the errors
   const errors = validationResult(req);
@@ -98,6 +116,8 @@ exports.postSignup = (req, res, next) => {
       pageTitle: "SignUp",
       path: "/signup",
       errorMessage: errors.array()[0].msg,
+      oldInput: { email, password, confirmPassword },
+      validationErrors: errors.array(),
     });
   }
 
