@@ -91,30 +91,24 @@ exports.postSignup = (req, res, next) => {
       errorMessage: errors.array()[0].msg,
     });
   }
-  User.findOne({ email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash("error", "Email already exist, please pick a different one.");
 
-        return res.redirect("/signup");
-      }
-      // 12 is the number of hashing required and 12 is secured
-      // this will return us a promise
-      // nested then block, this makes logically correct
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const user = new User({
-            email,
-            password: hashedPassword,
-            cart: { items: [] },
-          });
-          return user.save();
-        })
-        .then((result) => {
-          res.redirect("/login");
-          // configuring email to be sent
-          const htmlContent = `<!DOCTYPE html>
+  // 12 is the number of hashing required and 12 is secured
+  // this will return us a promise
+  // nested then block, this makes logically correct
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+      // configuring email to be sent
+      const htmlContent = `<!DOCTYPE html>
             <html lang="en">
             <head>
               <meta charset="UTF-8">
@@ -163,27 +157,25 @@ exports.postSignup = (req, res, next) => {
               <a href="http://localhost:3000/">Start Shopping</a>
             </body>
             </html>`;
-          const msg = {
-            to: email,
-            from: `pixiemj00@gmail.com`,
-            subject: "Signup successfully",
-            text: "Signup successfully",
-            html: htmlContent,
-          };
-          //send the email
-          transporter.sendMail(msg, function (error, info) {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log("Email sent: " + info.response);
-            }
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      const msg = {
+        to: email,
+        from: `pixiemj00@gmail.com`,
+        subject: "Signup successfully",
+        text: "Signup successfully",
+        html: htmlContent,
+      };
+      //send the email
+      transporter.sendMail(msg, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
     })
-
+    .catch((err) => {
+      console.log(err);
+    })
     .catch((err) => {
       console.log(err);
     });
