@@ -1,7 +1,8 @@
-// inbuilt lib
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+// this gives us all the errors which prior middleware might have stored
+const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 // env
@@ -79,6 +80,18 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
+  // to retrieve validation result fn will go through that errors object managed by that middleware on the request and will then collect them all
+  // in this error constant and we can use that constant, using that constant we can check for the errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    // console.log(errors.array());
+    // 422 - validation failed status code
+    return res.status(422).render("auth/signup", {
+      pageTitle: "SignUp",
+      path: "/signup",
+      errorMessage: errors.array()[0].msg,
+    });
+  }
   User.findOne({ email })
     .then((userDoc) => {
       if (userDoc) {
