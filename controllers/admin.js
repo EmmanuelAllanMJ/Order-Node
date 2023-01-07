@@ -49,7 +49,18 @@ exports.postAddProduct = (req, res, next) => {
       console.log("Created Product");
       res.redirect("/admin/products");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      // return res.status(500).render("admin/edit-product", {
+      //   pageTitle: "Add Product",
+      //   path: "/admin/edit-product",
+      //   editing: false,
+      //   hasError: true,
+      //   product: { title, imageUrl, price, description },
+      //   errorMessage: "Database operation failed, Please try again later",
+      //   validationErrors: [],
+      // });
+      res.redirect("/500");
+    });
 };
 exports.getEditProduct = (req, res, next) => {
   // Query params are query after ? in the address, used to add optional info
