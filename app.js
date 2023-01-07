@@ -54,25 +54,6 @@ app.use(
 app.use(csrfProtection);
 app.use(flash());
 
-app.use((req, res, next) => {
-  if (!req.session.user) {
-    return next();
-  }
-
-  User.findById(req.session.user._id)
-    .then((user) => {
-      if (!user) {
-        return next();
-      }
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      // we are throwing error if there is any technical issue
-      throw new Error(err);
-    });
-});
-
 // after user middleware and before routes
 app.use((req, res, next) => {
   // special field on the response, the local field, this allows us to set local variables that are passed into the views local
@@ -82,12 +63,51 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
+
+  // throw new Error("Sync Dummy");
+  User.findById(req.session.user._id)
+    .then((user) => {
+      // throw new Error("Dummy");
+      if (!user) {
+        return next();
+      }
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      // we are throwing error if there is any technical issue, and this will not reach the express error handling middleware
+      // ṭhere can be problem regarding infinite loop if we throw error outside
+      // throw new Error(err);
+
+      // instead of using async code snippet we wrap the error to next
+      // Express executes middleware (anything that uses app.use())from top to bottom as it is defined in our app.js file.
+      // If we call next(error) in our route, then it'll send the error to the next piece of middleware that expects error as an argument
+      next(new Error(err));
+    });
+});
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
 app.use("/500", errorController.get500);
-app.use("/", errorController.get404);
+app.use(errorController.get404);
+
+// this is a special middleware where when we call next(error) it will skip all the middleware and move to this
+// if we have more error middleware, then they will execute from top to bottom
+app.use((error, req, res, next) => {
+  // res.status(error.httpStatus).render();
+  // res.redirect("/500");
+  res.status(500).render("500", {
+    pageTitle: "Error",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
+  });
+});
 
 mongoose
   .connect(MONGODB_URI)

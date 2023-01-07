@@ -13,7 +13,9 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -41,7 +43,9 @@ exports.getIndex = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 exports.getCart = (req, res, next) => {
@@ -58,7 +62,9 @@ exports.getCart = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -82,7 +88,9 @@ exports.postCartDelete = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -120,13 +128,8 @@ exports.postOrders = (req, res, next) => {
       res.redirect("/orders");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
-
-// exports.getCheckout = (req, res, next) => {
-//   res.render("shop/checkout", {
-//     pageTitle: "Checkout",
-//     path: "/checkout",
-//   });
-// };
