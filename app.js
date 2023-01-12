@@ -5,6 +5,8 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
+const multer = require("multer");
+const { v4: uuidv4 } = require("uuid");
 
 // controller
 const errorController = require("./controllers/error");
@@ -35,9 +37,25 @@ const store = new MongoDBStore({
 // default settings, initializing csrf
 const csrfProtection = csrf();
 
+// config option for file storage
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // if null means no error
+    // images is where we need to store
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, uuidv4() + "-" + file.originalname);
+  },
+});
+
 app.set("view engine", "ejs");
 app.set("views", "views");
+// this urlencoder can only accept data as text, not file as file is binary data
 app.use(bodyParser.urlencoded({ extended: false }));
+// for single file, the file field name is image
+// image will be saved in /images folder
+app.use(multer({ storage: fileStorage }).single("image"));
 
 // Telling the folder which you want to give read access
 app.use(express.static(path.join(__dirname, "public")));
