@@ -70,8 +70,10 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
 
-// Telling the folder which you want to give read access
+// Telling the folder which you want to give read access, they are considered as root folder
 app.use(express.static(path.join(__dirname, "public")));
+// here /images will be considered as static folder
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use(
   session({
