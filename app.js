@@ -49,13 +49,26 @@ const fileStorage = multer.diskStorage({
   },
 });
 
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  }
+  cb(null, false);
+};
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 // this urlencoder can only accept data as text, not file as file is binary data
 app.use(bodyParser.urlencoded({ extended: false }));
 // for single file, the file field name is image
 // image will be saved in /images folder
-app.use(multer({ storage: fileStorage }).single("image"));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 
 // Telling the folder which you want to give read access
 app.use(express.static(path.join(__dirname, "public")));
