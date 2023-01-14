@@ -1,5 +1,7 @@
 const Product = require("../models/Product");
 const Order = require("../models/order");
+const fs = require("fs");
+const path = require("path");
 
 exports.getProducts = (req, res, next) => {
   // find will give us the products not the cursor. To get cursor we use .find().cursor().next() next to get the last element
@@ -131,5 +133,38 @@ exports.postOrders = (req, res, next) => {
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
+    });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  const invoiceName = "invoice-" + orderId + ".pdf";
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        // as there is no error to return, we throw error
+        return next(new Error("No order found."));
+      }
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error("Unauthorized."));
+      } // to have universal path across os
+      const invoicePath = path.join("data", "invoices", invoiceName);
+      fs.readFile(invoicePath, (err, data) => {
+        if (err) {
+          return next(err);
+        }
+        // to make sure the file is downloaded as pdf
+        res.setHeader("Content-Type", "application/pdf");
+        // tells how the content should be served to the client
+        res.setHeader(
+          "Content-Disposition",
+          "inline; filename='" + invoiceName + "'"
+        );
+
+        res.send(data);
+      });
+    })
+    .catch((err) => {
+      next(err);
     });
 };
