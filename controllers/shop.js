@@ -4,9 +4,12 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 
+const ITEMS_PER_PAGE = 2;
+
 exports.getProducts = (req, res, next) => {
   // find will give us the products not the cursor. To get cursor we use .find().cursor().next() next to get the last element
   Product.find()
+
     .then((products) => {
       // console.log(products);
       res.render("shop/product-list", {
@@ -35,7 +38,11 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
+  const page = req.query.page;
+
   Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
     .then((products) => {
       res.render("shop/index", {
         prods: products,
