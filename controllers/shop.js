@@ -150,6 +150,39 @@ exports.getInvoice = (req, res, next) => {
         return next(new Error("Unauthorized."));
       } // to have universal path across os
       const invoicePath = path.join("data", "invoices", invoiceName);
+
+      // pdfkit
+      const pdfDoc = new PDFDocument();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        "inline; filename='" + invoiceName + "'"
+      );
+      // this gives us readable stream
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      // return to users
+      pdfDoc.pipe(res);
+
+      // to add single line
+      pdfDoc.fontSize(26).text("Invoice", { underline: true });
+      pdfDoc.text("---------------------------");
+      let totalPrice = 0;
+      order.products.forEach((prod) => {
+        totalPrice += prod.quantity * prod.product.price;
+        pdfDoc
+          .fontSize(14)
+          .text(
+            prod.product.title +
+              " - " +
+              prod.quantity +
+              " x $ " +
+              prod.product.price
+          );
+      });
+      pdfDoc.text("------");
+      pdfDoc.fontSize(20).text("Total Price : $" + totalPrice);
+      pdfDoc.end();
+
       // here we are reading files which is ok for tiny files, but for large files this is bad and can cause overflow
       // when there is large number of request
       // fs.readFile(invoicePath, (err, data) => {
@@ -167,18 +200,18 @@ exports.getInvoice = (req, res, next) => {
       //   res.send(data);
       // });
 
-      // streaming a file
-      // here node will read the file by chunks
-      const file = fs.createReadStream(invoicePath);
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        "inline; filename='" + invoiceName + "'"
-      );
-      // the response object is a writable stream, so we are piping readable stream, the files into the response,
-      // the response will be streamed to the browser which will contain the data, and downloaded by the browser step by step
-      // this is an advantage for large files because node never has to preload the data into memory but just streams it to the client
-      file.pipe(res);
+      // // streaming a file
+      // // here node will read the file by chunks
+      // const file = fs.createReadStream(invoicePath);
+      // res.setHeader("Content-Type", "application/pdf");
+      // res.setHeader(
+      //   "Content-Disposition",
+      //   "inline; filename='" + invoiceName + "'"
+      // );
+      // // the response object is a writable stream, so we are piping readable stream, the files into the response,
+      // // the response will be streamed to the browser which will contain the data, and downloaded by the browser step by step
+      // // this is an advantage for large files because node never has to preload the data into memory but just streams it to the client
+      // file.pipe(res);
     })
     .catch((err) => {
       next(err);
