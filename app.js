@@ -1,4 +1,6 @@
 const bodyParser = require("body-parser");
+const fs = require("fs");
+// const https = require("https");
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
@@ -9,6 +11,7 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const helmet = require("helmet");
 const compression = require("compression");
+const morgan = require("morgan");
 
 // controller
 const errorController = require("./controllers/error");
@@ -38,6 +41,10 @@ const store = new MongoDBStore({
 
 // default settings, initializing csrf
 const csrfProtection = csrf();
+
+// to read files
+const privateKey = fs.readFileSync("server.key");
+const certificate = fs.readFileSync("server.cert");
 
 // config option for file storage
 const fileStorage = multer.diskStorage({
@@ -71,8 +78,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
+
+// instead of logging into console, we are storing to a file
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
 app.use(helmet());
 app.use(compression());
+app.use(morgan("combined", { stream: accessLogStream }));
 
 // Telling the folder which you want to give read access, they are considered as root folder
 app.use(express.static(path.join(__dirname, "public")));
@@ -149,7 +163,10 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
-    app.listen(3000);
+    // https
+    //   .createServer({ key: privateKey, cert: certificate }, app)
+    // .listen(process.env.PORT || 3000);
+    app.listen(process.env.PORT || 3000);
   })
   .catch((err) => {
     console.log(err);
