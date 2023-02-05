@@ -8,6 +8,7 @@ const flash = require("connect-flash");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const helmet = require("helmet");
+const compression = require("compression");
 
 // controller
 const errorController = require("./controllers/error");
@@ -71,6 +72,7 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
 app.use(helmet());
+app.use(compression());
 
 // Telling the folder which you want to give read access, they are considered as root folder
 app.use(express.static(path.join(__dirname, "public")));
