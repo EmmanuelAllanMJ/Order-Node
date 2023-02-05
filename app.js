@@ -7,6 +7,7 @@ const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const helmet = require("helmet");
 
 // controller
 const errorController = require("./controllers/error");
@@ -23,7 +24,7 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 const mongoose = require("mongoose");
-const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.lfr5p.mongodb.net/${process.env.MONGODB_DEFAULT_DB}`;
+const MONGODB_URI = process.env.DATABASE_URL;
 
 const app = express();
 // mongodbstore will yield a constructor where you can pass object
@@ -69,6 +70,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
+app.use(helmet());
 
 // Telling the folder which you want to give read access, they are considered as root folder
 app.use(express.static(path.join(__dirname, "public")));
