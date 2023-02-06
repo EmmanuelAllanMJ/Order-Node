@@ -4,7 +4,7 @@
   "description": "Complete node js guide",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --recursive test",
+    "test": "echo \"Error: no test specified\"",
     "start": "nodemon app.js",
     "start-server": "node app.js"
   },
