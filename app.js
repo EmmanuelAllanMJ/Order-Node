@@ -37,6 +37,9 @@ const app = express();
 const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "sessions",
+  ttl: 24 * 60 * 60 * 1000,
+  autoRemove: "interval",
+  autoRemoveInterval: 10, // Value in minutes (default is 10)
 });
 
 // default settings, initializing csrf
@@ -99,9 +102,6 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: store,
-    ttl: 24 * 60 * 60 * 1000,
-    autoRemove: "interval",
-    autoRemoveInterval: 10, // Value in minutes (default is 10)
   })
 );
 // using csrf middleware
