@@ -97,12 +97,15 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use(
-  session({
-    secret: "my string",
-    resave: false,
-    saveUninitialized: false,
-    store: store,
-  })
+  session(
+    {
+      secret: "my string",
+      resave: false,
+      saveUninitialized: false,
+      store: store,
+    },
+    ({ _ts: 1 }, { expireAfterSeconds: 60 })
+  )
 );
 // using csrf middleware
 app.use(csrfProtection);
