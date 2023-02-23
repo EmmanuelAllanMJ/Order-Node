@@ -98,7 +98,10 @@ app.use(
     secret: "my string",
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store: new MongoDBStore({
+      uri: MONGODB_URI,
+    }),
+    ttl: 24 * 60 * 60 * 1000,
   })
 );
 // using csrf middleware
