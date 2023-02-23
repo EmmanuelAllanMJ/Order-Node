@@ -98,10 +98,10 @@ app.use(
     secret: "my string",
     resave: false,
     saveUninitialized: false,
-    store: new MongoDBStore({
-      uri: MONGODB_URI,
-    }),
+    store: store,
     ttl: 24 * 60 * 60 * 1000,
+    autoRemove: "interval",
+    autoRemoveInterval: 10, // Value in minutes (default is 10)
   })
 );
 // using csrf middleware
