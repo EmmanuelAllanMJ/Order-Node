@@ -106,8 +106,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 7,
       saveUninitialized: true,
       store: store,
-    }
-    // ({ _ts: 1 }, { expireAfterSeconds: 60 })
+    }({ _ts: 1 }, { expireAfterSeconds: 60 })
   )
 );
 // using csrf middleware
